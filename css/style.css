@@ -1,0 +1,340 @@
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --purple: #B200FF;
+  --black: #0A0A0A;
+  --white: #ffffff;
+  --side-pad: 55px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+html {
+  scroll-behavior: auto;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--black);
+  background: var(--white);
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+
+/* ══════════════════════════════════════════════
+   INTRO OVERLAY – papírový trhací efekt
+   Ozubený pravý okraj je konstantní; overlay
+   se odtrhne doleva pomocí clip-path animace.
+══════════════════════════════════════════════ */
+
+/*
+   Polygon má 19 bodů (stejný počet ve všech
+   třech stavech – GSAP pak může plynule interpolovat):
+   – startPath: pravý okraj rovný na 100 %
+   – tornPath:  pravý okraj s ozubeným trhem
+   – endPath:   celý polygon smrštěn doleva (off-screen)
+*/
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--purple);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+#intro-logo {
+  width: clamp(160px, 20vw, 280px);
+  opacity: 0.35;
+  filter: brightness(0) invert(1);
+}
+
+#intro-logo img {
+  width: 100%;
+  height: auto;
+}
+
+/* ══════════════════════════════════════════════
+   FOTO – fixní, pravá polovina
+══════════════════════════════════════════════ */
+#photo-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 58%;
+  height: 100vh;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#main-photo {
+  width: 100%;
+  height: 110%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(100%);
+}
+
+/* ══════════════════════════════════════════════
+   HERO BLOCK – jméno + PORTFOLIO SVG jako jeden
+   fixní celek; JS ho centruje, GSAP morphuje do
+   headerové pozice
+══════════════════════════════════════════════ */
+#hero-block {
+  position: fixed;
+  left: var(--side-pad);
+  /* top nastaví JS */
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  transform-origin: left top;
+  pointer-events: none;
+  opacity: 0; /* zobrazí se po intro */
+}
+
+#hero-name {
+  font-family: var(--font-body);
+  font-size: clamp(18px, 2.2vw, 34px);
+  font-weight: 400;
+  color: var(--black);
+  line-height: 1.5;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+#portfolio-svg {
+  width: clamp(300px, 55vw, 830px);
+  height: auto;
+  display: block;
+}
+
+/* ══════════════════════════════════════════════
+   HERO SEKCE – kontakty + CTA
+══════════════════════════════════════════════ */
+#hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background: transparent;
+  z-index: 2;
+}
+
+#hero-meta {
+  position: absolute;
+  left: var(--side-pad);
+  bottom: 20%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 3;
+  opacity: 0; /* zobrazí se po intro */
+}
+
+#hero-contacts {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-weight: 400;
+  color: var(--black);
+}
+
+#hero-contacts a:hover { color: var(--purple); }
+
+#cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--purple);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: clamp(13px, 1vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  padding: 11px 28px;
+  border-radius: 50px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════
+   ABOUT SEKCE
+══════════════════════════════════════════════ */
+#about {
+  position: relative;
+  width: 100%;
+  height: 85vh;
+  min-height: 560px;
+  background: transparent;
+  z-index: 2;
+}
+
+#timeline {
+  position: fixed;
+  left: 62.8%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#timeline-line {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--black);
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+
+#timeline-dot {
+  position: absolute;
+  top: 8%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--black);
+  box-shadow: 0 0 0 3px rgba(178, 0, 255, 0.25);
+  animation: timelinePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes timelinePulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(178, 0, 255, 0.3); }
+  50%       { box-shadow: 0 0 0 10px rgba(178, 0, 255, 0); }
+}
+
+.timeline-anchor {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--purple);
+  pointer-events: all;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.timeline-anchor:hover {
+  transform: translate(-50%, -50%) scale(1.8);
+}
+
+.timeline-anchor-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid var(--purple);
+  pointer-events: none;
+}
+
+#about-content {
+  position: absolute;
+  left: var(--side-pad);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(706px, 46%);
+  z-index: 3;
+}
+
+#about-heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 28px;
+}
+
+/* Písmena v animovaných nadpisech */
+.ch {
+  display: inline-block;
+}
+
+#about-text {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--black);
+}
+
+/* ══════════════════════════════════════════════
+   ZKUŠENOSTI SEKCE – stejný layout jako about
+══════════════════════════════════════════════ */
+#experience {
+  position: relative;
+  width: 100%;
+  height: 85vh;
+  min-height: 560px;
+  background: transparent;
+  z-index: 2;
+}
+
+
+#experience-content {
+  position: absolute;
+  left: var(--side-pad);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(706px, 46%);
+  z-index: 3;
+}
+
+#experience-heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 28px;
+}
+
+#experience-text {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--black);
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVITA
+══════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root { --side-pad: 40px; }
+  #portfolio-svg { width: clamp(260px, 58vw, 700px); }
+}
+
+@media (max-width: 768px) {
+  :root { --side-pad: 24px; }
+  #photo-container { width: 100%; opacity: 0.2; }
+  #portfolio-svg { width: clamp(220px, 80vw, 500px); }
+  #hero-contacts { flex-direction: column; align-items: flex-start; gap: 8px; }
+  #hero-meta { bottom: 12%; }
+  #about-content { width: calc(100% - 48px); }
+  #timeline { display: none; }
+}
+
+@media (max-width: 480px) {
+  #portfolio-svg { width: calc(100vw - 48px); }
+}

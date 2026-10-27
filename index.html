@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ondřej Dúbravčík – Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ─── INTRO OVERLAY ─────────────────────── -->
+  <div id="intro-overlay">
+    <div id="intro-logo">
+      <img src="assets/logo.svg" alt="PF Logo" />
+    </div>
+  </div>
+
+  <!-- ─── FOTO – fixní, opacity se mění scrollem ─── -->
+  <div id="photo-container">
+    <img id="main-photo" src="assets/me.png" alt="Ondřej Dúbravčík" />
+  </div>
+
+  <!-- ─── HERO BLOCK – jméno + nadpis jako jeden celek, morphuje do headeru ─── -->
+  <div id="hero-block">
+    <span id="hero-name">Ondřej Dúbravčík</span>
+    <img id="portfolio-svg" src="assets/PORTFOLIO.svg" alt="PORT FOLIO" />
+  </div>
+
+  <!-- ─── HERO SEKCE – kontakty + CTA ─────────── -->
+  <section id="hero">
+    <div id="hero-meta">
+      <div id="hero-contacts">
+        <a href="mailto:dubra@vcik.cz">dubra@vcik.cz</a>
+        <span>UČO: 264112</span>
+        <a href="https://linkedin.com/in/dubra" target="_blank" rel="noopener">linkedin.com/in/dubra</a>
+      </div>
+      <a id="cta-btn" href="#about">NEBOJ SE A SCROLLUJ</a>
+    </div>
+  </section>
+
+  <!-- ─── TIMELINE – fixní, přes všechny sekce ── -->
+  <div id="timeline">
+    <div id="timeline-line"></div>
+    <div id="timeline-dot"></div>
+  </div>
+
+  <!-- ─── ABOUT SEKCE ─────────────────────────── -->
+  <section id="about">
+    <div id="about-content">
+      <h2 id="about-heading">O MNĚ</h2>
+      <p id="about-text">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi,
+        finibus quis feugiat et, vehicula id leo. Vestibulum ante ipsum primis in
+        faucibus orci luctus et ultrices posuere cubilia curae; Duis dictum neque
+        vel magna faucibus, suscipit pellentesque erat faucibus. Nam in sem ornare
+        metus sollicitudin imperdiet id lacinia lectus. Vestibulum venenatis luctus
+        fringilla. Aenean varius non eros non consectetur. Proin ligula erat,
+        fermentum vitae tortor nec, vestibulum fringilla lorem. Nam efficitur
+        sollicitudin bibendum. Pellentesque porta suscipit metus ac laoreet.
+        Maecenas porta purus quis euismod fringilla.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── ZKUŠENOSTI SEKCE ────────────────────── -->
+  <section id="experience">
+    <div id="experience-content">
+      <h2 id="experience-heading">ZKUŠENOSTI</h2>
+      <p id="experience-text">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi,
+        finibus quis feugiat et, vehicula id leo. Vestibulum ante ipsum primis in
+        faucibus orci luctus et ultrices posuere cubilia curae; Duis dictum neque
+        vel magna faucibus, suscipit pellentesque erat faucibus. Nam in sem ornare
+        metus sollicitudin imperdiet id lacinia lectus. Vestibulum venenatis luctus
+        fringilla. Aenean varius non eros non consectetur. Proin ligula erat,
+        fermentum vitae tortor nec, vestibulum fringilla lorem. Nam efficitur
+        sollicitudin bibendum. Pellentesque porta suscipit metus ac laoreet.
+        Maecenas porta purus quis euismod fringilla.
+      </p>
+    </div>
+  </section>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
