@@ -109,19 +109,18 @@ function initHeroAnimations() {
    3. SCROLL ANIMACE
 ══════════════════════════════════════════════ */
 function initScrollAnimations() {
-  const block  = document.getElementById('hero-block');
-  const heroTop = parseFloat(block.dataset.heroTop);
+  const block = document.getElementById('hero-block');
 
   // Cílová výška hero-blocku v headeru (~68px: malé jméno + malý SVG)
   const TARGET_H   = 68;
-  const scale      = TARGET_H / block.offsetHeight;
   const TARGET_TOP = 14; // px od vrchu viewportu
-  const deltaY     = TARGET_TOP - heroTop;
 
   /* ── 3a. Hero-block morph do headeru ── */
+  // Funkční hodnoty + invalidateOnRefresh → po resize se přepočítají
+  // z nové velikosti bloku (layoutHeroBlock běží v refreshInit)
   gsap.to('#hero-block', {
-    y: deltaY,
-    scale: scale,
+    y:     () => TARGET_TOP - parseFloat(block.dataset.heroTop),
+    scale: () => TARGET_H / block.offsetHeight,
     transformOrigin: 'left top',
     ease: 'none',
     scrollTrigger: {
@@ -129,6 +128,7 @@ function initScrollAnimations() {
       start: 'top 88%',
       end: 'top 42%',   // kratší range = rychlejší
       scrub: 0.6,        // nižší = rychlejší odezva na scroll
+      invalidateOnRefresh: true,
     }
   });
 
@@ -211,7 +211,7 @@ function initScrollAnimations() {
   });
 
   /* ── 3e. About obsah přijede ── */
-  // Nadpis animuje přes scrambleHeading (infotabule efekt)
+  // Nadpis se objeví písmeno po písmenu (revealHeading)
   revealHeading(document.getElementById('about-heading'), {
     trigger: '#about-heading',
     start: 'top 65%',
@@ -264,10 +264,10 @@ function initScrollAnimations() {
 }
 
 /* ══════════════════════════════════════════════
-   SCRAMBLE HEADING – informační tabule efekt
-   Každé písmeno rychle míchá náhodné znaky
-   a pak se jeden po druhém (zleva) zamkne na
-   správný znak. Reusable pro jakýkoli nadpis.
+   REVEAL HEADING – písmeno po písmenu
+   Rozdělí text na .ch spany, ty postupně
+   (zleva) spadnou shora a zviditelní se.
+   Reusable pro jakýkoli nadpis.
 
    @param el      – DOM element s textem nadpisu
    @param trigger – objekt { trigger, start } pro ScrollTrigger
@@ -297,18 +297,8 @@ function revealHeading(el, { trigger, start = 'top 42%' } = {}) {
 ══════════════════════════════════════════════ */
 function createTimelineAnchors() {
   const tl    = document.getElementById('timeline');
-  const vh    = window.innerHeight;
   const about = document.getElementById('about');
   const exp   = document.getElementById('experience');
-
-  // Stejný rozsah jako scrub tečky: 'top top' → 'bottom bottom'
-  const scrollMin   = about.offsetTop;
-  const scrollMax   = exp.offsetTop + exp.offsetHeight - vh;
-  const scrollRange = scrollMax - scrollMin;
-
-  // Dot cestuje z 8 % na 88 % (viz gsap.to '#timeline-dot')
-  const DOT_START = 8;
-  const DOT_END   = 88;
 
   const sections = [
     { el: about, label: 'O mně'      },
@@ -316,15 +306,10 @@ function createTimelineAnchors() {
   ];
 
   sections.forEach(({ el, label }) => {
-    // scrollY kdy je střed sekce uprostřed viewportu
-    const scrollAtCenter = el.offsetTop + el.offsetHeight / 2 - vh / 2;
-    const progress = Math.max(0, Math.min(1, (scrollAtCenter - scrollMin) / scrollRange));
-    const topPct   = DOT_START + progress * (DOT_END - DOT_START);
-
     const dot = document.createElement('div');
     dot.className = 'timeline-anchor';
-    dot.style.top = topPct + '%';
     dot.title     = label;
+    dot._section  = el;
 
     dot.addEventListener('click', () => {
       // Pulsující ring při kliknutí
@@ -340,6 +325,33 @@ function createTimelineAnchors() {
     });
 
     tl.appendChild(dot);
+  });
+
+  positionTimelineAnchors();
+  // Po každém refreshi (resize) přepočítej pozice kotev
+  ScrollTrigger.addEventListener('refresh', positionTimelineAnchors);
+}
+
+function positionTimelineAnchors() {
+  const vh    = window.innerHeight;
+  const about = document.getElementById('about');
+  const exp   = document.getElementById('experience');
+
+  // Stejný rozsah jako scrub tečky: 'top top' → 'bottom bottom'
+  const scrollMin   = about.offsetTop;
+  const scrollMax   = exp.offsetTop + exp.offsetHeight - vh;
+  const scrollRange = scrollMax - scrollMin;
+
+  // Dot cestuje z 8 % na 88 % (viz gsap.to '#timeline-dot')
+  const DOT_START = 8;
+  const DOT_END   = 88;
+
+  document.querySelectorAll('.timeline-anchor').forEach(dot => {
+    const el = dot._section;
+    // scrollY kdy je střed sekce uprostřed viewportu
+    const scrollAtCenter = el.offsetTop + el.offsetHeight / 2 - vh / 2;
+    const progress = Math.max(0, Math.min(1, (scrollAtCenter - scrollMin) / scrollRange));
+    dot.style.top = DOT_START + progress * (DOT_END - DOT_START) + '%';
   });
 }
 
@@ -359,12 +371,8 @@ document.getElementById('cta-btn').addEventListener('mouseleave', () => {
 
 /* ══════════════════════════════════════════════
    RESIZE
+   ScrollTrigger při resize sám volá refresh();
+   hero-block přecentrujeme ještě před ním, aby
+   morph (3a) četl nové heroTop
 ══════════════════════════════════════════════ */
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    ScrollTrigger.refresh();
-    layoutHeroBlock();
-  }, 250);
-});
+ScrollTrigger.addEventListener('refreshInit', layoutHeroBlock);

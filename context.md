@@ -98,11 +98,15 @@ if (window.scrollY > window.innerHeight * 0.3) {
 - Timeline je jeden fixed element, ne per-sekce — nebluruje, kotvy jsou klikatelné
 - Sekce `#about` a `#experience` jsou `height: 85vh` (ne 100vh) — těsnější za sebou
 - Blur animuje content elementy přes `filter: blur()` + opacity, timeline zůstává ostrá
+- Resize: `ScrollTrigger.addEventListener('refreshInit', layoutHeroBlock)` — hero-block se přecentruje před každým refreshem;
+  morph používá funkční hodnoty `y`/`scale` + `invalidateOnRefresh`, kotvy timeline se přepočítají na `refresh` (`positionTimelineAnchors`)
 
 ## Responsivita
 - Desktop: 1280px+ (referenční)
 - Tablet 768–1279px: menší padding, menší SVG
-- Mobile <768px: foto 100% opacity 0.2, timeline schovaná, about-content full width
+- Mobile <768px: foto 100% opacity 0.2, timeline schovaná, about-content + experience-content full width
+- Na výšku: foto se řídí výškou okna (`height: 100%; width: auto; max-width: 100%`, zarovnané vpravo dole),
+  PORTFOLIO SVG má strop `min(…, 100vh)`, `@media (max-height: 700px)` zmenší mezery v hero-meta a u nadpisů
 
 ## TODO
 - [ ] Doplnit skutečný text (O mně, Zkušenosti)

@@ -78,11 +78,17 @@ img { display: block; }
   z-index: 1;
   overflow: hidden;
   pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
 }
 
+/* Velikost fotky se řídí výškou okna (ne šířkou) – v nízkém
+   okně se zmenší místo toho, aby ji cover přiblížil */
 #main-photo {
-  width: 100%;
-  height: 110%;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
   object-fit: cover;
   object-position: center top;
   filter: grayscale(100%);
@@ -118,7 +124,8 @@ img { display: block; }
 }
 
 #portfolio-svg {
-  width: clamp(300px, 55vw, 830px);
+  /* min(…, 100vh) – v nízkém okně se SVG nepřekrývá s kontakty */
+  width: min(clamp(300px, 55vw, 830px), 100vh);
   height: auto;
   display: block;
 }
@@ -322,19 +329,27 @@ img { display: block; }
 ══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   :root { --side-pad: 40px; }
-  #portfolio-svg { width: clamp(260px, 58vw, 700px); }
+  #portfolio-svg { width: min(clamp(260px, 58vw, 700px), 100vh); }
 }
 
 @media (max-width: 768px) {
   :root { --side-pad: 24px; }
   #photo-container { width: 100%; opacity: 0.2; }
-  #portfolio-svg { width: clamp(220px, 80vw, 500px); }
+  #portfolio-svg { width: min(clamp(220px, 80vw, 500px), 100vh); }
   #hero-contacts { flex-direction: column; align-items: flex-start; gap: 8px; }
   #hero-meta { bottom: 12%; }
-  #about-content { width: calc(100% - 48px); }
+  #about-content,
+  #experience-content { width: calc(100% - 48px); }
   #timeline { display: none; }
 }
 
 @media (max-width: 480px) {
-  #portfolio-svg { width: calc(100vw - 48px); }
+  #portfolio-svg { width: min(calc(100vw - 48px), 100vh); }
+}
+
+/* Nízké okno (na výšku) */
+@media (max-height: 700px) {
+  #hero-meta { bottom: 12%; gap: 16px; }
+  #about-heading,
+  #experience-heading { margin-bottom: 18px; }
 }
