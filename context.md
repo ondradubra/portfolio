@@ -8,7 +8,7 @@
 ## Technologie
 - Čistý HTML + CSS + JavaScript (bez frameworků)
 - GSAP 3 + ScrollTrigger plugin pro animace
-- Google Fonts: Syne (ExtraBold 800) + Plus Jakarta Sans (Regular 400, Medium 500)
+- Google Fonts: Syne (ExtraBold 800) + Plus Jakarta Sans (Regular 400, Medium 500, SemiBold 600)
 
 ## Design tokeny
 - `--purple: #B200FF`
@@ -21,7 +21,10 @@
 portfolio/
 ├── index.html
 ├── context.md
+├── data/
+│   └── articles.json   (články – id, semester, title, perex, image)
 ├── assets/
+│   ├── articles/placeholder.jpg (placeholder obrázku článku z Figmy)
 │   ├── me.png          (B&W foto – fixní vpravo)
 │   ├── logo.svg        (PF monogram – černý s fialovým gradientem)
 │   └── PORTFOLIO.svg   (hlavní nadpis – 901×254 viewBox)
@@ -35,7 +38,8 @@ portfolio/
 1. **Intro overlay** – fialová obrazovka, PF logo uprostřed
 2. **Hero** – PORTFOLIO SVG + jméno (hero-block), foto vpravo, kontakty + CTA
 3. **O mně** (`#about`) – 85vh, obsah vlevo, timeline vpravo
-4. **Zkušenosti** (`#experience`) – 85vh, stejný layout jako O mně
+4. **Články** (`#articles`) – karty cik-cak kolem timeline, generuje JS z `data/articles.json`
+   (Figma screen „List articles“, node 21:2). Sekce Zkušenosti byla odstraněna.
 
 ## Animační flow
 
@@ -67,18 +71,41 @@ portfolio/
 - `position: fixed; left: 62.8%; top: 0; bottom: 0; z-index: 4`
 - Appearance: toggle reverse při zpátečním scrollu
 - Linka: scaleY 0→1, trigger `top 55%`, toggleActions reverse
-- Pohyblivá tečka: scrub top 8%→88%, rozsah od `#about top top` do `#experience bottom bottom`
+- Pohyblivá tečka: top 8%→88%, rozsah od `#about top top` do `#articles bottom bottom`
+  - MAGNETICKÁ (`initMagneticDot` + `magnetize`): úsek mezi sousedními kotvami se dělí na
+    drž (38 %) – přeskok (24 %, power2.inOut) – drž (38 %) → tečka většinu scrollu sedí na kotvě
+    a k další se přicvakne; síla = konstanta `MAGNET_HOLD`. Pozice se dotahuje `gsap.to` 0.35 s.
+  - přichycená tečka má `.is-docked`: větší průhledný fialový kroužek kolem fialové kotvy + elastický „cvak“
 - Pohyblivá tečka má CSS `animation: timelinePulse` (pulsující box-shadow)
 - Kotevní body: JS vypočítá pozici z `(scrollAtCenter - scrollMin) / scrollRange * 80 + 8`
-  - scrollMin = about.offsetTop, scrollMax = exp.offsetTop + exp.offsetHeight - vh
-  - klik: expandující ring (GSAP scale 1→5, opacity 1→0) + scrollIntoView
+  - kotvy = minimapa: About + každý článek, fialové tečky (`.timeline-anchor` > `-dot` + `-label`)
+  - scrollMin = pageTop(about), scrollMax = pageTop(articles) + articles.offsetHeight - vh
+  - klik: expandující ring (GSAP scale 1→5, opacity 1→0) + scrollIntoView (článek na střed)
+  - hover: fialový štítek s názvem (CSS transition, clip-path wipe zleva)
+  - aktivní článek = kotva připojená spojnicí ke kartě: `.is-active` → fialová záře
+
+**Články:**
+- Liché karty: pravá hrana 25px před linkou; sudé: u levého okraje
+- Spojnice `.article-connector` (`initArticleConnectors`): vykreslí se animovaně (scaleX 0→1, origin vlevo),
+  jen když je kotva článku na úrovni karty (±12px od hran); vede vodorovně ve výšce kotvy → vždy spojuje
+  tečku a kartu; po opuštění úrovně se stáhne. `#articles` má malý spodní padding (10vh),
+  aby poslední karta na konci zůstala připojená
+- Obrázek, nadpis i tlačítko karty vedou na stejný `href` (zatím `#`); hover obrázku/nadpisu → nadpis fialový + zoom obrázku 1.04
+- Nadpis karty: line-height 1.04
+- Blur-out karet stejně jako O mně (filter blur 16px + opacity 0.08, `center 32%` → `top -10%`);
+  proto reveal animuje celý řádek `.article`, ne kartu (jinak by se tweeny praly o opacity)
+- Všechna `.btn` mají magnetický hover (`initMagneticButtons`, volá se po renderu článků)
+- Karta přijede zespodu (toggle reverse)
+- Popisek semestru: fixní svislý text vpravo, jeden na semestr, opacity on/off
+  od `top center` prvního článku semestru (poslední semestr drží do `bottom top` posledního článku)
+- `#top-fade`: bílý přechod pod zmenšeným headerem (Figma Frame 10), naběhne s morphem
 
 **Nadpisy (letter-by-letter reveal):**
 - `revealHeading(el, { trigger, start })` — rozdělí text na `.ch` spany
 - GSAP from: opacity 0, y: -0.3em, stagger: 0.04, toggleActions reverse
 
 **Blur-out při odscrollování (mléčné sklo):**
-- animuje pouze `#about-content` a `#experience-content` (ne timeline)
+- animuje `#about-content` a `.article-card` (ne timeline)
 - trigger na content elementu: start `center 32%`, end `top -10%`, scrub: 1.4
 - blur: 0→16px, opacity: 1→0.08
 
@@ -96,7 +123,8 @@ if (window.scrollY > window.innerHeight * 0.3) {
 - `#hero-block` a `#photo-container` jsou `position: fixed` — JS centruje block opticky (×0.42)
 - `initScrollAnimations()` se volá z `onComplete` hero timeline, ne z intro — jinak GSAP zachytí opacity:0
 - Timeline je jeden fixed element, ne per-sekce — nebluruje, kotvy jsou klikatelné
-- Sekce `#about` a `#experience` jsou `height: 85vh` (ne 100vh) — těsnější za sebou
+- Sekce `#about` je `height: 85vh` (ne 100vh)
+- Články se načítají `fetch`em ještě před `layoutHeroBlock` / ScrollTriggery → nutný lokální server (file:// nefunguje)
 - Blur animuje content elementy přes `filter: blur()` + opacity, timeline zůstává ostrá
 - Resize: `ScrollTrigger.addEventListener('refreshInit', layoutHeroBlock)` — hero-block se přecentruje před každým refreshem;
   morph používá funkční hodnoty `y`/`scale` + `invalidateOnRefresh`, kotvy timeline se přepočítají na `refresh` (`positionTimelineAnchors`)
@@ -104,13 +132,14 @@ if (window.scrollY > window.innerHeight * 0.3) {
 ## Responsivita
 - Desktop: 1280px+ (referenční)
 - Tablet 768–1279px: menší padding, menší SVG
-- Mobile <768px: foto 100% opacity 0.2, timeline schovaná, about-content + experience-content full width
+- Mobile <768px: foto 100% opacity 0.2, timeline + semestr schované, about-content a karty full width bez cik-caku
 - Na výšku: foto se řídí výškou okna (`height: 100%; width: auto; max-width: 100%`, zarovnané vpravo dole),
   PORTFOLIO SVG má strop `min(…, 100vh)`, `@media (max-height: 700px)` zmenší mezery v hero-meta a u nadpisů
 
 ## TODO
-- [ ] Doplnit skutečný text (O mně, Zkušenosti)
-- [ ] Přidat další sekce (projekty, kontakt)
+- [ ] Doplnit skutečný text (O mně) a skutečné články do `data/articles.json`
+- [ ] Detail článku (Figma node 19:2 – logo, ZPĚT, obrázek, H1–H4, odrážky) – tlačítko „Řekni mi víc“ zatím `href="#"`
+- [ ] Spodní bílý fade (Figma Frame 3) zatím není implementovaný
 - [ ] Fine-tuning blur start hodnoty (center 32% — lze upravit)
 - [ ] Responsivita timeline kotev na mobile
 

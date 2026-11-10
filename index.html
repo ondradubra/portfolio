@@ -6,7 +6,7 @@
   <title>Ondřej Dúbravčík – Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -37,9 +37,12 @@
         <span>UČO: 264112</span>
         <a href="https://linkedin.com/in/dubra" target="_blank" rel="noopener">linkedin.com/in/dubra</a>
       </div>
-      <a id="cta-btn" href="#about">NEBOJ SE A SCROLLUJ</a>
+      <a id="cta-btn" class="btn" href="#about">NEBOJ SE A SCROLLUJ</a>
     </div>
   </section>
+
+  <!-- ─── HORNÍ PŘECHOD – bílý fade pod headerem ─── -->
+  <div id="top-fade"></div>
 
   <!-- ─── TIMELINE – fixní, přes všechny sekce ── -->
   <div id="timeline">
@@ -65,23 +68,13 @@
     </div>
   </section>
 
-  <!-- ─── ZKUŠENOSTI SEKCE ────────────────────── -->
-  <section id="experience">
-    <div id="experience-content">
-      <h2 id="experience-heading">ZKUŠENOSTI</h2>
-      <p id="experience-text">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi,
-        finibus quis feugiat et, vehicula id leo. Vestibulum ante ipsum primis in
-        faucibus orci luctus et ultrices posuere cubilia curae; Duis dictum neque
-        vel magna faucibus, suscipit pellentesque erat faucibus. Nam in sem ornare
-        metus sollicitudin imperdiet id lacinia lectus. Vestibulum venenatis luctus
-        fringilla. Aenean varius non eros non consectetur. Proin ligula erat,
-        fermentum vitae tortor nec, vestibulum fringilla lorem. Nam efficitur
-        sollicitudin bibendum. Pellentesque porta suscipit metus ac laoreet.
-        Maecenas porta purus quis euismod fringilla.
-      </p>
-    </div>
+  <!-- ─── ČLÁNKY – karty cik-cak, generuje JS z data/articles.json ─── -->
+  <section id="articles">
+    <div id="articles-list"></div>
   </section>
+
+  <!-- Popisky semestrů – fixní vpravo, generuje JS -->
+  <div id="semester-labels"></div>
 
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

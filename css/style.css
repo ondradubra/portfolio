@@ -164,7 +164,8 @@ img { display: block; }
 
 #hero-contacts a:hover { color: var(--purple); }
 
-#cta-btn {
+/* Fialové pill tlačítko – CTA v hero i "Řekni mi víc" v kartách */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -195,6 +196,7 @@ img { display: block; }
 #timeline {
   position: fixed;
   left: 62.8%;
+  left: round(down, 62.8%, 1px); /* celé px → linka, kroužek i kotvy ostré a soustředné */
   top: 0;
   bottom: 0;
   width: 1px;
@@ -217,7 +219,7 @@ img { display: block; }
   position: absolute;
   top: 8%; left: 50%;
   transform: translate(-50%, -50%) scale(0);
-  width: 14px; height: 14px;
+  width: 15px; height: 15px; /* liché rozměry → střed na celém px (linka 1px) */
   border-radius: 50%;
   background: var(--white);
   border: 1.5px solid var(--black);
@@ -225,25 +227,81 @@ img { display: block; }
   animation: timelinePulse 2.4s ease-in-out infinite;
 }
 
+/* Tečka přichycená ke kotvě – fialový kroužek kolem fialové tečky */
+#timeline-dot.is-docked {
+  width: 25px; height: 25px;
+  background: transparent;
+  border: 2px solid var(--purple);
+}
+
+#timeline-dot {
+  transition: width 0.25s ease, height 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+
 @keyframes timelinePulse {
   0%, 100% { box-shadow: 0 0 0 3px rgba(178, 0, 255, 0.3); }
   50%       { box-shadow: 0 0 0 10px rgba(178, 0, 255, 0); }
 }
 
+/* Obal kotvy = větší plocha pro hover/klik; drží tečku i popisek */
 .timeline-anchor {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 21px; height: 21px; /* lichá → 7px tečka sedí na celých px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.timeline-anchor-dot {
+  position: relative;
   width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--purple);
-  pointer-events: all;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-.timeline-anchor:hover {
-  transform: translate(-50%, -50%) scale(1.8);
+.timeline-anchor:hover .timeline-anchor-dot {
+  transform: scale(1.8);
+}
+
+/* Aktivní článek (karta ve středu viewportu) – fialová záře */
+.timeline-anchor.is-active .timeline-anchor-dot {
+  transform: scale(1.8);
+  box-shadow: 0 0 0 3px rgba(178, 0, 255, 0.25), 0 0 14px 4px rgba(178, 0, 255, 0.55);
+}
+
+/* Popisek na hover – fialový štítek vpravo od linky (Figma: +28 px od osy) */
+.timeline-anchor-label {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  width: max-content;
+  max-width: 294px;
+  padding: 5px 13px;
+  background: var(--purple);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 32px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-10px, -50%);
+  clip-path: inset(0 100% 0 0);
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    clip-path 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timeline-anchor:hover .timeline-anchor-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+  clip-path: inset(0 0 0 0);
 }
 
 .timeline-anchor-ring {
@@ -287,41 +345,148 @@ img { display: block; }
 }
 
 /* ══════════════════════════════════════════════
-   ZKUŠENOSTI SEKCE – stejný layout jako about
+   HORNÍ FADE – bílý přechod pod zmenšeným headerem,
+   aby karty nezajížděly pod PORTFOLIO (Figma Frame 10)
 ══════════════════════════════════════════════ */
-#experience {
+#top-fade {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 177px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--white) 55%, rgba(255, 255, 255, 0));
+  opacity: 0;
+}
+
+/* ══════════════════════════════════════════════
+   ČLÁNKY – karty cik-cak kolem timeline
+   Liché karty: pravá hrana 25 px před linkou
+   Sudé karty: u levého okraje, dlouhá spojnice
+══════════════════════════════════════════════ */
+#articles {
+  --card-w: 478px;
+  --timeline-x: 62.8%;   /* stejné jako #timeline left */
+  --connector-y: 12px;   /* výška spojnice od horní hrany karty */
   position: relative;
   width: 100%;
-  height: 85vh;
-  min-height: 560px;
-  background: transparent;
+  padding: 18vh 0 10vh;  /* malý spodek → poslední karta zůstane na konci na úrovni své kotvy */
   z-index: 2;
 }
 
+#articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-#experience-content {
+.article {
+  position: relative;
+  width: 100%;
+}
+
+.article:nth-child(odd)  { --card-left: calc(var(--timeline-x) - 25px - var(--card-w)); }
+.article:nth-child(even) { --card-left: var(--side-pad); }
+
+/* Spojnice karta → kotva na timeline; výšku (top) a vykreslení
+   (scaleX 0→1) řídí JS podle polohy kotvy */
+.article-connector {
   position: absolute;
-  left: var(--side-pad);
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(706px, 46%);
-  z-index: 3;
+  top: var(--connector-y);
+  left: calc(var(--card-left) + var(--card-w));
+  right: calc(100% - var(--timeline-x));
+  height: 1px;
+  background: var(--black);
+  transform: scaleX(0);
+  transform-origin: left center;
 }
 
-#experience-heading {
+.article-card {
+  margin-left: var(--card-left);
+  width: var(--card-w);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 17px;
+  padding: 10px 10px 30px;
+  background: var(--white);
+  border: 1px solid var(--black);
+}
+
+.article-image-link {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.article-image {
+  width: 100%;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  aspect-ratio: 456 / 199;
+  object-fit: cover;
+}
+
+.article-body {
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+}
+
+.article-title {
   font-family: var(--font-display);
-  font-size: clamp(28px, 3vw, 42px);
+  font-size: 32px;
   font-weight: 800;
+  line-height: 1.04;
+  text-transform: uppercase;
   color: var(--black);
-  margin-bottom: 28px;
 }
 
-#experience-text {
+.article-title-link {
+  transition: color 0.25s ease;
+}
+
+/* Hover na obrázek / nadpis: nadpis zfialoví, obrázek se lehce přiblíží */
+.article-title-link:hover,
+.article-card:has(.article-image-link:hover) .article-title-link {
+  color: var(--purple);
+}
+
+.article-image-link:hover .article-image,
+.article-card:has(.article-title-link:hover) .article-image {
+  transform: scale(1.04);
+}
+
+.article-perex {
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 18px);
-  font-weight: 400;
-  line-height: 1.7;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 32px;
   color: var(--black);
+}
+
+.article-btn {
+  font-size: 18px;
+  padding: 11px 26px;
+}
+
+/* ══════════════════════════════════════════════
+   SEMESTR – svislý popisek u pravého okraje,
+   objeví se u prvního článku semestru
+══════════════════════════════════════════════ */
+.semester-label {
+  position: fixed;
+  right: 23px;
+  top: 55%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 71px;
+  white-space: nowrap;
+  color: rgba(10, 10, 10, 0.2);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
 }
 
 /* ══════════════════════════════════════════════
@@ -329,6 +494,8 @@ img { display: block; }
 ══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   :root { --side-pad: 40px; }
+  #articles { --card-w: min(478px, calc(62.8vw - 25px - 40px)); }
+  .article-title { font-size: 26px; }
   #portfolio-svg { width: min(clamp(260px, 58vw, 700px), 100vh); }
 }
 
@@ -338,9 +505,14 @@ img { display: block; }
   #portfolio-svg { width: min(clamp(220px, 80vw, 500px), 100vh); }
   #hero-contacts { flex-direction: column; align-items: flex-start; gap: 8px; }
   #hero-meta { bottom: 12%; }
-  #about-content,
-  #experience-content { width: calc(100% - 48px); }
+  #about-content { width: calc(100% - 48px); }
   #timeline { display: none; }
+  #articles { --card-w: calc(100% - 2 * var(--side-pad)); }
+  .article { --card-left: var(--side-pad) !important; }
+  .article-connector { display: none; }
+  .article-title { font-size: 24px; }
+  .article-perex { font-size: 16px; line-height: 1.6; }
+  .semester-label { display: none; }
 }
 
 @media (max-width: 480px) {
@@ -350,6 +522,5 @@ img { display: block; }
 /* Nízké okno (na výšku) */
 @media (max-height: 700px) {
   #hero-meta { bottom: 12%; gap: 16px; }
-  #about-heading,
-  #experience-heading { margin-bottom: 18px; }
+  #about-heading { margin-bottom: 18px; }
 }

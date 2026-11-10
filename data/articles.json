@@ -1,0 +1,23 @@
+[
+  {
+    "id": "clanek-1",
+    "semester": 1,
+    "title": "Nadpis článku, klidně i na dva řádky",
+    "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
+    "image": "assets/articles/placeholder.jpg"
+  },
+  {
+    "id": "clanek-2",
+    "semester": 1,
+    "title": "Druhý článek",
+    "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
+    "image": "assets/articles/placeholder.jpg"
+  },
+  {
+    "id": "clanek-3",
+    "semester": 1,
+    "title": "Třetí článek s delším nadpisem na dva řádky",
+    "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
+    "image": "assets/articles/placeholder.jpg"
+  }
+]
