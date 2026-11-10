@@ -72,6 +72,9 @@ portfolio/
    - Mobil: sloupce pod sebou, semestr se rozbaluje dolů (`grid-template-rows` 0fr → 1fr).
    - Detail: otevře se semestr aktuálního článku, článek je označený (`aria-current`).
    - Homepage: Návrat domů / O mně jen odscrollují (`navigateHome`), bez reloadu.
+   - Ikony MENU i Zavřít mají 44×44 px (desktop i mobil); Zavřít se na hover otočí o 90°.
+   - Pozor: obsah semestru má při otevření `visibility: inherit`, ne `visible` – jinak by
+     přebil skrytý overlay a texty by po zavření menu zůstaly viset.
 - Texty: všude „SEMESTR“ (ne „SEMESTER“).
 
 ## Animační flow
@@ -175,6 +178,8 @@ if (window.scrollY > window.innerHeight * 0.3) {
 - [ ] Spodní bílý fade (Figma Frame 3) zatím není implementovaný
 - [ ] Fine-tuning blur start hodnoty (center 32% — lze upravit)
 - [ ] Responsivita timeline kotev na mobile
+- [ ] Mobil: fixní ZPĚT na detailu může překrývat text – zatím nerozhodnuto
+- [ ] Ve Figmě (List articles) ještě přepsat „SEMESTER 1“ na „SEMESTR 1“
 
 ## Spuštění lokálně
 ```bash
