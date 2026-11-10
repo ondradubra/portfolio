@@ -1,0 +1,307 @@
+/* ══════════════════════════════════════════════
+   MENU – tlačítko + overlay "harmonika"
+   Figma: "Menu button" (22:164), "Overlay menu" (22:48)
+   Markup generuje js/common.js (initMenu)
+══════════════════════════════════════════════ */
+
+/* ── Tlačítko MENU – fixní vpravo nahoře ── */
+#menu-toggle-wrap {
+  position: fixed;
+  top: 47px;
+  right: 61px;
+  z-index: 20;
+}
+
+/* Na homepage se objeví až se zmenšeným headerem (GSAP v main.js) */
+.page-home #menu-toggle-wrap {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#menu-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 44px; /* šířka podle popisku, ikona 44 px */
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--black);
+  opacity: 0.2;
+  transition: opacity 0.3s ease;
+}
+
+#menu-toggle:hover,
+#menu-toggle:focus-visible {
+  opacity: 1;
+}
+
+#menu-toggle img {
+  width: 44px;
+  height: 44px;
+  padding: 4.4px 0; /* ikona 44×35.2 vycentrovaná ve 44×44 (Figma inset 10 %) */
+}
+
+.menu-label {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 32px;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* ══════════════════════════════════════════════
+   OVERLAY
+══════════════════════════════════════════════ */
+#menu-overlay {
+  --sem-collapsed: 105px;
+  --sem-open: 374px;
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  visibility: hidden;
+}
+
+#menu-overlay.is-visible { visibility: visible; }
+
+/* ── Sloupec semestru ── */
+.menu-sem {
+  position: relative;
+  flex: 0 0 var(--sem-collapsed);
+  height: 100%;
+  overflow: hidden;
+  background: var(--sem-bg);
+  color: var(--white);
+  transition: flex-basis 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.menu-sem.is-open { flex-basis: var(--sem-open); }
+
+/* Celý sbalený sloupec je tlačítko se svislým popiskem */
+.menu-sem-toggle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.menu-sem-vertical {
+  writing-mode: vertical-rl;
+  font-family: var(--font-display);
+  font-size: 27.5px;
+  font-weight: 800;
+  line-height: 49px;
+  white-space: nowrap;
+  opacity: 0.2;
+  transition: opacity 0.3s ease;
+}
+
+.menu-sem-toggle:hover .menu-sem-vertical,
+.menu-sem-toggle:focus-visible .menu-sem-vertical { opacity: 0.6; }
+
+.menu-sem.is-open .menu-sem-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Obsah rozbaleného sloupce – pevná šířka, aby se při animaci nezalamoval */
+.menu-sem-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--sem-open);
+  padding: 25px 36px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.menu-sem.is-open .menu-sem-body {
+  opacity: 1;
+  visibility: inherit; /* ne "visible" – to by přebilo skrytý overlay a texty by po zavření zůstaly */
+  transition: opacity 0.4s ease 0.25s, visibility 0s;
+}
+
+.menu-sem-heading {
+  font-family: var(--font-display);
+  font-size: 27.5px;
+  font-weight: 800;
+  line-height: 53px;
+  text-align: center;
+  margin-bottom: 37px;
+}
+
+.menu-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.menu-links a {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 32px;
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  transition: opacity 0.2s ease;
+}
+
+.menu-links a:hover { opacity: 0.7; }
+
+.menu-links a[aria-current="page"] {
+  text-decoration: none;
+  border-left: 3px solid var(--white);
+  padding-left: 10px;
+}
+
+.menu-empty {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 32px;
+  opacity: 0.6;
+}
+
+/* ── Černý panel – výchozí menu ── */
+.menu-main {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  background: var(--black);
+  color: var(--white);
+  padding: 115px 44px 44px;
+}
+
+.menu-nav {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.menu-nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: fit-content;
+}
+
+.menu-nav img { width: 40px; height: 40px; }
+
+.menu-nav a:hover .menu-label { opacity: 0.7; }
+
+/* Zavřít – vpravo nahoře v overlayi */
+#menu-close {
+  position: absolute;
+  top: 28px;
+  right: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--white);
+  cursor: pointer;
+}
+
+#menu-close img {
+  width: 44px;
+  height: 44px;
+  padding: 1px 0; /* ikona 44×42 ve 44×44 */
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#menu-close:hover img { transform: rotate(90deg); }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVITA
+══════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  #menu-overlay { --sem-collapsed: 64px; --sem-open: 320px; }
+  .menu-sem-vertical { font-size: 22px; }
+  .menu-sem-body { padding: 25px 24px; }
+}
+
+/* Mobil: harmonika svisle – semestry pod sebou, rozbalují se dolů */
+@media (max-width: 768px) {
+  #menu-toggle-wrap { top: 16px; right: 16px; }
+  #menu-toggle { width: 44px; gap: 4px; }
+  #menu-toggle img { width: 44px; height: 44px; padding: 4.4px 0; }
+  #menu-toggle .menu-label { font-size: 14px; line-height: 20px; }
+
+  #menu-overlay {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .menu-sem {
+    flex: 0 0 auto;
+    height: auto;
+    display: grid;
+    grid-template-rows: 56px 0fr;
+    transition: grid-template-rows 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  /* flex-basis z desktopu (šířka 374 px) by se ve sloupci stala výškou */
+  .menu-sem.is-open { flex-basis: auto; grid-template-rows: 56px 1fr; }
+
+  .menu-sem-toggle {
+    position: static;
+    justify-content: flex-start;
+    padding: 0 24px;
+  }
+
+  .menu-sem-vertical {
+    writing-mode: horizontal-tb;
+    font-size: 20px;
+    opacity: 0.35;
+  }
+
+  /* Na mobilu zůstává hlavička vidět i u otevřeného semestru */
+  .menu-sem.is-open .menu-sem-toggle { opacity: 1; pointer-events: none; }
+  .menu-sem.is-open .menu-sem-vertical { opacity: 1; }
+
+  .menu-sem-body {
+    position: static;
+    width: auto;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 24px;
+  }
+
+  .menu-sem.is-open .menu-sem-body { padding-bottom: 20px; }
+  .menu-sem-heading { display: none; }
+
+  .menu-main {
+    flex: 1 0 auto;
+    height: auto;
+    padding: 32px 24px 48px;
+  }
+
+  #menu-close {
+    position: fixed;
+    top: 8px;
+    right: 16px;
+    min-width: 44px;
+    gap: 2px;
+    z-index: 1;
+  }
+  #menu-close img { width: 44px; height: 44px; padding: 1px 0; }
+  #menu-close .menu-label { font-size: 13px; line-height: 18px; }
+}

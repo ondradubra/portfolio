@@ -22,7 +22,9 @@ function layoutHeroBlock() {
 window.addEventListener('load', async () => {
   // Články musí být v DOM dřív, než ScrollTrigger spočítá pozice
   await renderArticles();
+  initMenu(ARTICLES, { onNavigate: navigateHome });
   initMagneticButtons();
+  scrollToHashArticle();
   layoutHeroBlock();
 
   // Při reloadu na odscrollované stránce přeskoč intro + hero animaci,
@@ -63,9 +65,8 @@ async function renderArticles() {
     row.dataset.semester = article.semester;
 
     const card = el('div', 'article-card');
-    // Obrázek, nadpis i tlačítko vedou na stejné místo
-    // (detail článku zatím není → placeholder '#')
-    const href = '#';
+    // Obrázek, nadpis i tlačítko vedou na detail (šablona article.html)
+    const href = `article.html?id=${encodeURIComponent(article.id)}`;
 
     // Obrázek – odkaz, z tabového pořadí vyřazený (stejný cíl má nadpis)
     const imgLink = el('a', 'article-image-link');
@@ -94,6 +95,30 @@ async function renderArticles() {
     row.append(el('span', 'article-connector'), card);
     list.appendChild(row);
   });
+}
+
+// Návrat z detailu (index.html#article-<id>): karty vznikají až po fetchi,
+// takže prohlížeč na kotvu sám neodskočí → vycentruj kartu ručně.
+// Stránka je pak odscrollovaná → load přeskočí intro (viz MAIN INIT).
+function scrollToHashArticle() {
+  const target = location.hash && document.getElementById(location.hash.slice(1));
+  if (!target || !target.classList.contains('article')) return;
+  history.scrollRestoration = 'manual';
+  const r = target.getBoundingClientRect();
+  window.scrollTo(0, r.top + window.scrollY - (window.innerHeight - r.height) / 2);
+}
+
+// Menu na homepage – "Návrat domů" a "O mně" jen odscrollují (bez reloadu)
+function navigateHome(target) {
+  if (target === 'home') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return true;
+  }
+  if (target === 'about') {
+    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+    return true;
+  }
+  return false;
 }
 
 // Malý helper: element s třídou a textem (textContent → bezpečné vůči HTML v datech)
@@ -198,6 +223,18 @@ function initScrollAnimations() {
       end: 'top 42%',   // kratší range = rychlejší
       scrub: 0.6,        // nižší = rychlejší odezva na scroll
       invalidateOnRefresh: true,
+    }
+  });
+
+  // Tlačítko MENU se objeví spolu se zmenšeným headerem
+  gsap.fromTo('#menu-toggle-wrap', { autoAlpha: 0 }, {
+    autoAlpha: 1,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#about',
+      start: 'top 70%',
+      end: 'top 42%',
+      scrub: 0.6,
     }
   });
 
@@ -521,6 +558,9 @@ function magnetize(p, jumpEase) {
 ══════════════════════════════════════════════ */
 function initArticleAnimations() {
   const rows = [...document.querySelectorAll('.article')];
+  // Spojnice se počítají z polohy řádku → během příjezdu (y: 40 → 0)
+  // je nutné je přepočítávat, jinak by zůstaly posunuté
+  let refreshConnectors = () => {};
 
   rows.forEach(row => {
     // Reveal – animuje se celý řádek, opacity karty patří blur-outu (sekce 5)
@@ -529,6 +569,8 @@ function initArticleAnimations() {
       y: 40,
       duration: 0.6,
       ease: 'power3.out',
+      onUpdate: () => refreshConnectors(),
+      onReverseComplete: () => refreshConnectors(),
       scrollTrigger: {
         trigger: row,
         start: 'top 85%',
@@ -538,7 +580,7 @@ function initArticleAnimations() {
 
   });
 
-  initArticleConnectors(rows);
+  refreshConnectors = initArticleConnectors(rows);
 
   // Semestry – jeden fixní popisek na semestr, prolínání přes opacity
   const container = document.getElementById('semester-labels');
@@ -546,7 +588,7 @@ function initArticleAnimations() {
 
   semesters.forEach((sem, i) => {
     const semRows = rows.filter(r => r.dataset.semester === sem);
-    const label   = el('div', 'semester-label', `SEMESTER ${sem}`);
+    const label   = el('div', 'semester-label', `SEMESTR ${sem}`);
     container.appendChild(label);
 
     const isLast = i === semesters.length - 1;
@@ -624,28 +666,7 @@ function initArticleConnectors(rows) {
     onRefresh:   update,
   });
   update();
-}
-
-/* ══════════════════════════════════════════════
-   MICRO: magnetický hover na všech .btn
-   (CTA v hero + "Řekni mi víc" v kartách)
-══════════════════════════════════════════════ */
-function initMagneticButtons() {
-  document.querySelectorAll('.btn').forEach(btn => {
-    if (btn.dataset.magnetic) return;
-    btn.dataset.magnetic = '1';
-
-    btn.addEventListener('mousemove', (e) => {
-      const r  = btn.getBoundingClientRect();
-      const dx = (e.clientX - r.left - r.width  / 2) * 0.28;
-      const dy = (e.clientY - r.top  - r.height / 2) * 0.28;
-      gsap.to(btn, { x: dx, y: dy, duration: 0.3, ease: 'power2.out' });
-    });
-
-    btn.addEventListener('mouseleave', () => {
-      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.45)' });
-    });
-  });
+  return update;
 }
 
 /* ══════════════════════════════════════════════

@@ -1,0 +1,162 @@
+/* ══════════════════════════════════════════════
+   DETAIL ČLÁNKU (article.html)
+   Figma: "Article detail" (node 19:2)
+   Základ (reset, tokeny, .btn) je ve style.css
+══════════════════════════════════════════════ */
+
+/* ── Hlavní obrázek – Figma 1512×764, výška zmenšená o 30 % → 1512×535 ── */
+#article-hero {
+  width: 100%;
+  aspect-ratio: 1512 / 535;
+  max-height: 55vh;
+  overflow: hidden;
+  background: #e6e6e6;
+}
+
+#article-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Textový sloupec – 823 px (Figma: 1103 − 2×140) ── */
+#article-main {
+  padding: 69px var(--side-pad) 200px; /* spodek: místo pro fixní ZPĚT */
+}
+
+#article-detail {
+  max-width: 823px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Nadpisy – Syne 800, uppercase jako ve Figmě */
+#article-detail-title,
+#article-content h2,
+#article-content h3,
+#article-content h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+#article-detail-title   { font-size: 48px; line-height: 1.04; }
+#article-content h2     { font-size: 32px; line-height: 1.1; }
+#article-content h3     { font-size: 26px; line-height: 1.1; }
+#article-content h4     { font-size: 18px; line-height: 1.2; }
+
+/* ── Štítky ── */
+#article-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+#article-tags li {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 13px;
+  border: 1px solid var(--purple);
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--purple);
+  white-space: nowrap;
+}
+
+/* ── Obsah z fragmentu ── */
+#article-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 32px;
+  color: var(--black);
+}
+
+#article-content a {
+  font-weight: 700;
+  color: var(--purple);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#article-content a:hover { text-decoration-thickness: 2px; }
+
+/* Odrážky – fialový kosočtverec 8 px */
+#article-content ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0 20px;
+}
+
+#article-content li {
+  position: relative;
+  padding-left: 27px; /* 20 px ikona + 7 px mezera */
+  line-height: 1.4;
+}
+
+#article-content li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0.7em;
+  width: 8px; height: 8px;
+  background: var(--purple);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+#article-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Chybějící článek */
+.article-missing {
+  font-family: var(--font-body);
+  font-size: 18px;
+}
+
+/* ── ZPĚT – černé kolečko, fixní vlevo dole ── */
+#back-btn {
+  position: fixed;
+  left: 41px;
+  bottom: 55px;
+  z-index: 10;
+  width: 100px;
+  height: 100px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--black);
+  font-size: 18px;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVITA
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #article-hero { aspect-ratio: 40 / 21; max-height: 38vh; } /* 4:3 zmenšeno o 30 % */
+  #article-main { padding: 40px var(--side-pad) 140px; }
+  #article-detail-title { font-size: 32px; }
+  #article-content h2   { font-size: 24px; }
+  #article-content h3   { font-size: 20px; }
+  #article-content { font-size: 16px; line-height: 1.7; }
+  #article-tags li { font-size: 15px; }
+  #back-btn {
+    left: 16px;
+    bottom: 16px;
+    width: 72px;
+    height: 72px;
+    font-size: 15px;
+  }
+}

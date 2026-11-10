@@ -20,18 +20,25 @@
 ```
 portfolio/
 ├── index.html
+├── article.html        (šablona detailu článku – article.html?id=<id>)
 ├── context.md
 ├── data/
-│   └── articles.json   (články – id, semester, title, perex, image)
+│   ├── articles.json   (články – id, semester, title, perex, image, tags, content)
+│   └── articles/<id>.html (obsah článku – HTML fragment: p, h2–h4, ul, a, img)
 ├── assets/
 │   ├── articles/placeholder.jpg (placeholder obrázku článku z Figmy)
+│   ├── icons/          (menu, close, home, about – SVG z Figmy)
 │   ├── me.png          (B&W foto – fixní vpravo)
 │   ├── logo.svg        (PF monogram – černý s fialovým gradientem)
 │   └── PORTFOLIO.svg   (hlavní nadpis – 901×254 viewBox)
 ├── css/
-│   └── style.css
+│   ├── style.css       (homepage + základ: reset, tokeny, .btn)
+│   ├── article.css     (detail článku)
+│   └── menu.css        (tlačítko MENU + overlay menu)
 └── js/
-    └── main.js
+    ├── common.js       (sdílené: initMagneticButtons, initMenu)
+    ├── main.js         (homepage)
+    └── article.js      (detail článku)
 ```
 
 ## Sekce webu
@@ -40,6 +47,32 @@ portfolio/
 3. **O mně** (`#about`) – 85vh, obsah vlevo, timeline vpravo
 4. **Články** (`#articles`) – karty cik-cak kolem timeline, generuje JS z `data/articles.json`
    (Figma screen „List articles“, node 21:2). Sekce Zkušenosti byla odstraněna.
+
+5. **Detail článku** (`article.html?id=<id>`, Figma „Article detail“ node 19:2) – samostatná šablona:
+   obrázek přes celou šířku (1512/535 = Figma výška −30 %, max 55vh; mobil 40/21, max 38vh), sloupec 823px, H1 48px, štítky (fialový rámeček,
+   radius 9), obsah z fragmentu `content` (h2 32 / h3 26 / h4 18, odkazy bold fialové podtržené,
+   odrážky = fialový kosočtverec). ZPĚT = černé kolečko fixní vlevo dole (desktop 100px 41/55,
+   mobil 72px 16/16), vede na `index.html#article-<id>`.
+   - Animace: obrázek se odkryje zespodu (clip-path) + zoom-out → nadpis → štítky → ZPĚT zleva →
+     bloky obsahu po dávkách (`ScrollTrigger.batch`, once). `prefers-reduced-motion` → bez animací.
+   - Neznámé id → „Článek nenalezen“.
+   - Návrat na homepage: `scrollToHashArticle()` vycentruje kartu (karty vznikají až po fetchi);
+     stránka je odscrollovaná → intro se přeskočí.
+
+6. **Menu** (Figma „Menu button“ 22:164, „Overlay menu“ 22:48) – generuje `initMenu()` v common.js,
+   na obou stránkách:
+   - Tlačítko MENU fixní vpravo nahoře (top 47, right 61), opacity 0.2 → hover 1.
+     Homepage: objeví se se zmenšeným headerem (`.page-home` ho skryje, GSAP scrub na `#about`).
+     Detail: naběhne v úvodní animaci.
+   - Overlay: 6 sloupců semestrů (otevřený 374px s nadpisem a odkazy na články, sbalené 105px se
+     svislým „SEMESTR n“ opacity 0.2; barvy `MENU_COLORS` od #B200FF po #3A0053) + černý panel
+     (Návrat domů, O mně, Zavřít). Počet semestrů = `MENU_SEMESTERS`.
+   - Otevření = harmonika: sloupce se rozvinou zleva (clip-path, stagger 0.07), zavření opačně.
+     Přepnutí semestru = CSS transition `flex-basis`. Esc zavírá, scroll stránky je zamčený.
+   - Mobil: sloupce pod sebou, semestr se rozbaluje dolů (`grid-template-rows` 0fr → 1fr).
+   - Detail: otevře se semestr aktuálního článku, článek je označený (`aria-current`).
+   - Homepage: Návrat domů / O mně jen odscrollují (`navigateHome`), bez reloadu.
+- Texty: všude „SEMESTR“ (ne „SEMESTER“).
 
 ## Animační flow
 
@@ -90,13 +123,13 @@ portfolio/
   jen když je kotva článku na úrovni karty (±12px od hran); vede vodorovně ve výšce kotvy → vždy spojuje
   tečku a kartu; po opuštění úrovně se stáhne. `#articles` má malý spodní padding (10vh),
   aby poslední karta na konci zůstala připojená
-- Obrázek, nadpis i tlačítko karty vedou na stejný `href` (zatím `#`); hover obrázku/nadpisu → nadpis fialový + zoom obrázku 1.04
+- Obrázek, nadpis i tlačítko karty vedou na `article.html?id=<id>`; hover obrázku/nadpisu → nadpis fialový + zoom obrázku 1.04
 - Nadpis karty: line-height 1.04
 - Blur-out karet stejně jako O mně (filter blur 16px + opacity 0.08, `center 32%` → `top -10%`);
   proto reveal animuje celý řádek `.article`, ne kartu (jinak by se tweeny praly o opacity)
 - Všechna `.btn` mají magnetický hover (`initMagneticButtons`, volá se po renderu článků)
 - Karta přijede zespodu (toggle reverse)
-- Popisek semestru: fixní svislý text vpravo, jeden na semestr, opacity on/off
+- Popisek semestru („SEMESTR n“): fixní svislý text vpravo, jeden na semestr, opacity on/off
   od `top center` prvního článku semestru (poslední semestr drží do `bottom top` posledního článku)
 - `#top-fade`: bílý přechod pod zmenšeným headerem (Figma Frame 10), naběhne s morphem
 
@@ -138,7 +171,7 @@ if (window.scrollY > window.innerHeight * 0.3) {
 
 ## TODO
 - [ ] Doplnit skutečný text (O mně) a skutečné články do `data/articles.json`
-- [ ] Detail článku (Figma node 19:2 – logo, ZPĚT, obrázek, H1–H4, odrážky) – tlačítko „Řekni mi víc“ zatím `href="#"`
+- [ ] Skutečný obsah článků (fragmenty v `data/articles/` jsou zatím lorem ipsum ve struktuře z Figmy)
 - [ ] Spodní bílý fade (Figma Frame 3) zatím není implementovaný
 - [ ] Fine-tuning blur start hodnoty (center 32% — lze upravit)
 - [ ] Responsivita timeline kotev na mobile

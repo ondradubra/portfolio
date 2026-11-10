@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Titulek doplní JS podle článku -->
+  <title>Článek – Ondřej Dúbravčík</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/article.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+</head>
+<body class="page-article">
+
+  <!--
+    ŠABLONA DETAILU ČLÁNKU
+    article.html?id=<id> → data z data/articles.json
+    (title, tags, image) + obsah z HTML fragmentu
+    v poli "content" (data/articles/<id>.html)
+  -->
+
+  <!-- ─── HLAVNÍ OBRÁZEK – přes celou šířku ─── -->
+  <header id="article-hero">
+    <img id="article-hero-img" src="" alt="" />
+  </header>
+
+  <!-- ─── TEXT ČLÁNKU ─── -->
+  <main id="article-main">
+    <article id="article-detail">
+      <h1 id="article-detail-title"></h1>
+      <ul id="article-tags" aria-label="Štítky"></ul>
+      <div id="article-content"></div>
+    </article>
+  </main>
+
+  <!-- ─── ZPĚT – fixní vlevo dole ─── -->
+  <a id="back-btn" class="btn" href="index.html#articles">ZPĚT</a>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/article.js"></script>
+</body>
+</html>

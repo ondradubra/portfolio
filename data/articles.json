@@ -4,20 +4,37 @@
     "semester": 1,
     "title": "Nadpis článku, klidně i na dva řádky",
     "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
-    "image": "assets/articles/placeholder.jpg"
+    "image": "assets/articles/placeholder.jpg",
+    "tags": [
+      "#ux",
+      "#design",
+      "#research"
+    ],
+    "content": "data/articles/clanek-1.html"
   },
   {
     "id": "clanek-2",
     "semester": 1,
     "title": "Druhý článek",
     "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
-    "image": "assets/articles/placeholder.jpg"
+    "image": "assets/articles/placeholder.jpg",
+    "tags": [
+      "#frontend",
+      "#gsap"
+    ],
+    "content": "data/articles/clanek-2.html"
   },
   {
     "id": "clanek-3",
     "semester": 1,
     "title": "Třetí článek s delším nadpisem na dva řádky",
     "perex": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer quam nisi, finibus",
-    "image": "assets/articles/placeholder.jpg"
+    "image": "assets/articles/placeholder.jpg",
+    "tags": [
+      "#typografie",
+      "#web",
+      "#figma"
+    ],
+    "content": "data/articles/clanek-3.html"
   }
 ]
